@@ -42,13 +42,13 @@ class HookCli(unittest.TestCase):
 
     def test_file_ranked_json(self):
         path = write(self.d, "hooks.txt",
-                     "hey guys welcome back\nYou are wasting 3 hours a week on thumbnails — here is why\n")
+                     "hey guys welcome back\nYou are wasting 3 hours a week on thumbnails → here is why\n")
         r = run("yt-script", "hookscore.py", "--json", path)
         self.assertEqual(r.returncode, 0, r.stderr)
         rows = json.loads(r.stdout)
         self.assertEqual(len(rows), 2)
         self.assertGreaterEqual(rows[0]["verdict"], rows[1]["verdict"])
-        self.assertIn("—", rows[0]["hook"] + rows[1]["hook"])
+        self.assertIn("→", rows[0]["hook"] + rows[1]["hook"])
 
     def test_missing_file_exits_nonzero(self):
         r = run("yt-script", "hookscore.py", os.path.join(self.d, "nope.txt"))
