@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """chapters.py - YouTube chapters from a timestamped transcript.
 
-    python3 chapters.py transcript.srt            # or .vtt / whisper .json
-    python3 chapters.py transcript.srt --target 8 --json
+    python chapters.py transcript.srt            # or .vtt / whisper .json
+    python chapters.py transcript.srt --target 8 --json
 
 Prints a description block you can paste straight under a video. YouTube's own rules, enforced here
 rather than assumed: the list must start at 00:00, needs at least three entries, and each chapter
@@ -13,9 +13,22 @@ Boundaries come from the gaps - the pauses you actually took between sections - 
 the pause was and how much the vocabulary changes across it. It is a first draft you retitle, not a
 summariser.
 """
-import json, os, re, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "yt-edit"))
-from deadair import load, parse_ts  # noqa: E402  (same parser, one implementation)
+import importlib.util, json, os, re, sys
+
+def _deadair():
+    """The transcript parser lives in yt-edit/deadair.py (one implementation, not two). Load it by
+    explicit path so it works in the plugin cache, in ~/.claude/skills, or with deadair.py dropped
+    next to this file, and so nothing else on sys.path named 'deadair' can shadow it."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    for p in (os.path.join(here, "..", "yt-edit", "deadair.py"), os.path.join(here, "deadair.py")):
+        if os.path.exists(p):
+            spec = importlib.util.spec_from_file_location("yt_deadair", p)
+            mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+            return mod
+    sys.exit("chapters.py needs yt-edit/deadair.py. Install the yt-edit folder next to yt-chapters, "
+             "or copy deadair.py into this folder.")
+
+load = _deadair().load
 
 STOP = set("the a an of for to in on and or is are was were be been with this that it as at by from "
            "you your i my we our they them he she but so if then than there here what which who how "
@@ -30,9 +43,11 @@ def mmss(t):
     return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     a = sys.argv[1:]
     as_json = "--json" in a; a = [x for x in a if x != "--json"]
     target = int(a[a.index("--target") + 1]) if "--target" in a else 7
+    target = max(3, target)  # YouTube ignores a list with fewer than three
     a = [x for x in a if not x.startswith("--") and not x.isdigit()]
     if not a or not os.path.exists(a[0]): print(__doc__); sys.exit(1)
     cues = load(a[0])
@@ -58,7 +73,7 @@ def main():
         end = picked[n + 1] if n + 1 < len(picked) else dur
         text = " ".join(c[2] for c in cues if c[0] >= t and c[1] <= end)
         kw = [w for w in keywords(text)]
-        kw.sort(key=lambda w: -text.lower().count(w))
+        kw.sort(key=lambda w: (-text.lower().count(w), w))  # ties broken alphabetically: stable output
         title = " ".join(w.capitalize() for w in kw[:3]) or "Section"
         chapters.append({"start": round(t, 2), "label": mmss(t), "draft_title": title,
                          "seconds": round(end - t, 2)})

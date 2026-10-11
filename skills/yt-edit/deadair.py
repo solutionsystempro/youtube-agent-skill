@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """deadair.py - an edit decision list from a timestamped transcript.
 
-    python3 deadair.py transcript.srt            # or .vtt, or whisper .json
-    python3 deadair.py transcript.srt --floor 0.35 --json
+    python deadair.py transcript.srt            # or .vtt, or whisper .json
+    python deadair.py transcript.srt --floor 0.35 --json
 
 Finds three things and prints the cuts as a list you can act on, newest problem first:
   DEAD    gaps between spoken cues longer than the floor
@@ -22,25 +22,34 @@ def parse_ts(s):
     p = s.split(":")
     return int(p[0]) * 3600 + int(p[1]) * 60 + float(p[2]) if len(p) == 3 else int(p[0]) * 60 + float(p[1])
 
+TIMING = re.compile(r"\s*(\d[\d:.,]+)\s*-->\s*(\d[\d:.,]+)")
+TAGS = re.compile(r"<[^>]*>|\{\\[^}]*\}")  # <i>, <c>, <00:00:01.200> word stamps, {\an8}
+
 def load(path):
-    raw = open(path, encoding="utf-8", errors="replace").read()
-    if path.endswith(".json"):
+    with open(path, encoding="utf-8-sig", errors="replace") as fh:
+        raw = fh.read()
+    if path.lower().endswith(".json"):
         d = json.loads(raw)
-        segs = d.get("segments", d if isinstance(d, list) else [])
+        segs = d if isinstance(d, list) else d.get("segments", [])
         return [(float(s["start"]), float(s["end"]), (s.get("text") or "").strip()) for s in segs]
-    cues, cur = [], None
-    for line in raw.splitlines():
-        m = re.match(r"\s*(\d[\d:.,]+)\s*-->\s*(\d[\d:.,]+)", line)
-        if m:
-            cur = [parse_ts(m.group(1)), parse_ts(m.group(2)), []]
-            cues.append(cur)
-        elif cur is not None and line.strip() and not line.strip().isdigit():
-            cur[2].append(line.strip())
-    return [(a, b, " ".join(t)) for a, b, t in cues if t]
+    # Cues are blocks separated by blank lines, and only the lines AFTER the timing line are speech.
+    # Reading it that way keeps SRT indexes, VTT cue identifiers and NOTE blocks out of the text,
+    # and keeps a spoken line that happens to be all digits ("2024") in it.
+    cues = []
+    for block in re.split(r"\n[ \t]*\n", raw.replace("\r\n", "\n").replace("\r", "\n")):
+        lines = block.split("\n")
+        for k, line in enumerate(lines):
+            m = TIMING.match(line)
+            if m:
+                text = " ".join(" ".join(TAGS.sub("", l).split()) for l in lines[k + 1:]).strip()
+                if text: cues.append((parse_ts(m.group(1)), parse_ts(m.group(2)), " ".join(text.split())))
+                break
+    return cues
 
 def norm(t): return re.sub(r"[^a-z ]", "", t.lower()).split()
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     a = sys.argv[1:]
     as_json = "--json" in a; a = [x for x in a if x != "--json"]
     floor = float(a[a.index("--floor") + 1]) if "--floor" in a else 0.45
@@ -80,7 +89,7 @@ def main():
     for c in cuts:
         print(f"    {c['kind']:<7} {c['start']:8.2f} -> {c['end']:8.2f}   {c['end']-c['start']:5.2f}s   {c['why']}")
     print(f"\n  {len(cuts)} cuts, {removed:.2f}s removed, {dur - removed:.2f}s out "
-          f"({removed / dur * 100:.1f}% shorter)\n")
+          f"({(removed / dur * 100) if dur else 0:.1f}% shorter)\n")
 
 if __name__ == "__main__":
     main()

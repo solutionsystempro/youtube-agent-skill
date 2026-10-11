@@ -5,9 +5,9 @@ Five properties, 0-100 each, and a verdict that is 60% the mean and 40% the weak
 weakest-link weighting is deliberate: a hook with four strong properties and one dead one is a hook
 that leaks at the dead one, and averaging hides that.
 
-    python3 hookscore.py hooks.txt            # one hook per line, ranked
-    python3 hookscore.py --hook "one line"    # score a single hook
-    python3 hookscore.py --json hooks.txt     # machine-readable
+    python hookscore.py hooks.txt            # one hook per line, ranked
+    python hookscore.py --hook "one line"    # score a single hook
+    python hookscore.py --json hooks.txt     # machine-readable
 
 WHAT THIS CAN AND CANNOT TELL YOU. Measured against 74 real short-form hooks (first 15 seconds of
 auto-captions, top-8 and bottom-8 by views across five channels): it separates deliberately bad
@@ -17,7 +17,8 @@ all. Treat a low score as a reason to look again, never a high score as a promis
 import json, os, re, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FORMULAS = json.load(open(os.path.join(HERE, "hooks.json")))["hooks"]
+with open(os.path.join(HERE, "hooks.json"), encoding="utf-8") as _fh:
+    FORMULAS = json.load(_fh)["hooks"]
 
 FILLER = {"basically","actually","literally","just","really","very","so","kind","sort","like",
           "guys","hey","welcome","today","video","subscribe","channel"}
@@ -103,15 +104,18 @@ FIX = {
 }
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     a = sys.argv[1:]
     as_json = "--json" in a
     a = [x for x in a if x != "--json"]
     if "--hook" in a:
         lines = [a[a.index("--hook") + 1]]
     elif a and os.path.exists(a[0]):
-        lines = [l for l in open(a[0]).read().splitlines() if l.strip()]
+        with open(a[0], encoding="utf-8-sig") as fh:
+            lines = [l for l in fh.read().splitlines() if l.strip()]
+        if not lines: print("no hooks in that file - one per line"); sys.exit(1)
     else:
-        print(__doc__); sys.exit(1 if not a else 0)
+        print(__doc__); sys.exit(1)
     out = []
     for t in lines:
         parts, verdict, name, hits = score(t)

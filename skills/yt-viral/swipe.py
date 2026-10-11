@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """swipe.py - rank collected videos by how far each beat its OWN channel, then name the formula.
 
-    python3 swipe.py collected.json
-    python3 swipe.py collected.json --min 2.0 --json
+    python swipe.py collected.json
+    python swipe.py collected.json --min 2.0 --json
 
 Input is a list you collected - one object per video:
 
@@ -19,7 +19,14 @@ about the words on screen, not a claim about why the video worked.
 import json, os, re, statistics, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FORMULAS = json.load(open(os.path.join(HERE, "..", "yt-script", "hooks.json")))["hooks"]
+with open(os.path.join(HERE, "..", "yt-script", "hooks.json"), encoding="utf-8") as _fh:
+    FORMULAS = json.load(_fh)["hooks"]
+
+def views_of(v):
+    """views, or the YouTube Data API's statistics.viewCount (a string), or view_count."""
+    raw = v.get("views", v.get("viewCount", v.get("view_count", (v.get("statistics") or {}).get("viewCount", 0))))
+    try: return float(str(raw or 0).replace(",", ""))
+    except ValueError: return 0.0
 
 def classify(title):
     scored = []
@@ -30,25 +37,27 @@ def classify(title):
     return scored[0][1] if scored else "Unclassified"
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     a = sys.argv[1:]
     as_json = "--json" in a; a = [x for x in a if x != "--json"]
     lo = float(a[a.index("--min") + 1]) if "--min" in a else 1.5
     files = [x for x in a if not x.startswith("--") and not re.match(r"^[\d.]+$", x)]
     if not files or not os.path.exists(files[0]): print(__doc__); sys.exit(1)
-    rows = json.load(open(files[0]))
+    with open(files[0], encoding="utf-8-sig") as fh:
+        rows = json.load(fh)
     if isinstance(rows, dict): rows = rows.get("videos", [])
     by = {}
-    for r in rows: by.setdefault(r.get("channel", "?"), []).append(r)
+    for r in rows: by.setdefault(r.get("channel") or r.get("channelTitle") or "?", []).append(r)
     out, thin = [], []
     for ch, vids in by.items():
-        views = [float(v.get("views", 0) or 0) for v in vids]
+        views = [views_of(v) for v in vids]
         med = statistics.median(views) if views else 0
         if len(vids) < 4:
             thin.append((ch, len(vids)))
             continue
         for v in vids:
-            m = (float(v.get("views", 0) or 0) / med) if med else 0
-            out.append({"channel": ch, "title": v.get("title", ""), "views": int(v.get("views", 0) or 0),
+            m = (views_of(v) / med) if med else 0
+            out.append({"channel": ch, "title": v.get("title", ""), "views": int(views_of(v)),
                         "median": int(med), "multiple": round(m, 2),
                         "formula": classify(v.get("title", "")), "url": v.get("url", "")})
     out = [r for r in out if r["multiple"] >= lo]

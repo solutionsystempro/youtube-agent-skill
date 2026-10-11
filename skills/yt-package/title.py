@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """title.py - lint a YouTube title and thumbnail pairing before you publish it.
 
-    python3 title.py --title "..." --thumb "AI RAN IT"
-    python3 title.py titles.txt            # one per line, ranked
-    python3 title.py --title "..." --json
+    python title.py --title "..." --thumb "AI RAN IT"
+    python title.py titles.txt            # one per line, ranked
+    python title.py --title "..." --json
 
 The pairing is the unit, not the title. A title that repeats the thumbnail text wastes half the
 click surface, and that is the single most common mistake this checks for.
@@ -51,7 +51,7 @@ def check(title, thumb=None):
                                         "the thumbnail should say what the title does not"))
         else:
             good.append("thumbnail and title carry different words")
-        if len(words(thumb)) > 4:
+        if len(words(thumb)) > 3:
             issues.append(("thumb-length", f"{len(words(thumb))} words on the thumbnail - three is the ceiling at feed size"))
     score = max(0, min(100, 100 - 14 * len(issues) + 4 * len(good)))
     return {"title": t, "chars": n, "score": score, "issues": issues, "good": good}
@@ -63,15 +63,19 @@ def show(r):
     for m in r["good"]:      print(f"    ok              {m}")
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     a = sys.argv[1:]
     as_json = "--json" in a; a = [x for x in a if x != "--json"]
     thumb = a[a.index("--thumb") + 1] if "--thumb" in a else None
     if "--title" in a:
         rows = [check(a[a.index("--title") + 1], thumb)]
-    elif a and os.path.exists(a[0]):
-        rows = [check(l, thumb) for l in open(a[0]).read().splitlines() if l.strip()]
     else:
-        print(__doc__); sys.exit(1)
+        values = {i + 1 for i, x in enumerate(a) if x == "--thumb"}
+        files = [x for i, x in enumerate(a) if i not in values and not x.startswith("--")]
+        if not files or not os.path.exists(files[0]): print(__doc__); sys.exit(1)
+        with open(files[0], encoding="utf-8-sig") as fh:
+            rows = [check(l, thumb) for l in fh.read().splitlines() if l.strip()]
+        if not rows: print("no titles in that file - one per line"); sys.exit(1)
     rows.sort(key=lambda r: -r["score"])
     if as_json: print(json.dumps(rows, indent=1)); return
     for r in rows: show(r)

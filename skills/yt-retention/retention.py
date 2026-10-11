@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """retention.py - read a YouTube Studio audience-retention export and find the leaks.
 
-    python3 retention.py retention.csv
-    python3 retention.py retention.csv --transcript transcript.srt   # names what was said at each drop
-    python3 retention.py retention.csv --json
+    python retention.py retention.csv
+    python retention.py retention.csv --transcript transcript.srt   # names what was said at each drop
+    python retention.py retention.csv --json
 
 Get the file from Studio: Analytics -> a video -> Engagement -> the audience-retention chart ->
 the download icon -> "Audience retention". Two columns, a position (percent or seconds) and a
-percentage still watching.
+percentage still watching. A YouTube Analytics API audienceRetention report also works: its
+elapsedVideoTimeRatio and audienceWatchRatio columns are 0-1 ratios and are scaled to percent.
 
 It reports three things, because they are three different problems with three different fixes:
   HOOK LEAK    what you lost in the first 30 seconds
@@ -17,7 +18,7 @@ It reports three things, because they are three different problems with three di
 With --transcript it prints what you were saying at each cliff, which is the only version of this
 report you can act on without scrubbing the video yourself.
 """
-import csv, json, os, re, sys
+import csv, importlib.util, json, os, re, sys
 
 def load_csv(path):
     rows = []
@@ -32,14 +33,36 @@ def load_csv(path):
             if len(vals) >= 2: rows.append((vals[0], vals[1]))
     return rows
 
+def to_percent(rows):
+    """Studio exports percentages; the Analytics API returns 0-1 ratios. Scale ratios up so the
+    thresholds below (25% hook leak, 0.8% cliffs) mean the same thing for both."""
+    xs = [r[0] for r in rows]; ys = [r[1] for r in rows]
+    if max(xs) <= 1.0: xs = [x * 100 for x in xs]
+    if max(ys) <= 2.0: ys = [y * 100 for y in ys]
+    return list(zip(xs, ys))
+
+def load_cues(path):
+    """The transcript parser is yt-edit/deadair.py. Loaded by explicit path so it works from the
+    plugin cache, ~/.claude/skills, or with deadair.py copied into this folder."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    for p in (os.path.join(here, "..", "yt-edit", "deadair.py"), os.path.join(here, "deadair.py")):
+        if os.path.exists(p):
+            spec = importlib.util.spec_from_file_location("yt_deadair", p)
+            mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+            return mod.load(path)
+    sys.exit("--transcript needs yt-edit/deadair.py. Install the yt-edit folder next to yt-retention.")
+
 def main():
+    if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     a = sys.argv[1:]
     as_json = "--json" in a; a = [x for x in a if x != "--json"]
     tr = a[a.index("--transcript") + 1] if "--transcript" in a else None
-    files = [x for x in a if not x.startswith("--") and x != tr]
+    values = {i + 1 for i, x in enumerate(a) if x in ("--transcript", "--duration")}
+    files = [x for i, x in enumerate(a) if i not in values and not x.startswith("--")]
     if not files or not os.path.exists(files[0]): print(__doc__); sys.exit(1)
     rows = load_csv(files[0])
     if len(rows) < 8: print("could not read at least 8 data points from that csv"); sys.exit(1)
+    rows = to_percent(rows)
     xs = [r[0] for r in rows]; ys = [r[1] for r in rows]
     pct_axis = max(xs) <= 100.5
     dur = None
@@ -63,8 +86,6 @@ def main():
     slide = sum(mid) / len(mid) if mid else 0
     said = {}
     if tr and os.path.exists(tr):
-        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "yt-edit"))
-        from deadair import load as load_cues
         cues = load_cues(tr)
         for c in cliffs:
             if c["at_seconds"] is None: continue
