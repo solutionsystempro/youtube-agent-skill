@@ -14,6 +14,7 @@ The retention graph is the only honest feedback YouTube gives you. Almost nobody
 ```bash
 python "${CLAUDE_SKILL_DIR}/retention.py" retention.csv --duration 600
 python "${CLAUDE_SKILL_DIR}/retention.py" retention.csv --transcript transcript.srt
+python "${CLAUDE_SKILL_DIR}/retention.py" retention.csv --ratio     # or --percent
 ```
 
 `${CLAUDE_SKILL_DIR}` is this skill's folder. Use `python3` if that is what your system calls
@@ -24,6 +25,9 @@ folder.
 Getting the file: Studio -> a video -> Analytics -> Engagement -> the audience-retention chart ->
 the download icon -> "Audience retention". The YouTube Analytics API `audienceRetention` report
 (the user's own OAuth) works too: its 0-1 ratio columns are scaled to percent automatically.
+The scale is read from the column header (`audienceWatchRatio` is a ratio, a `(%)` label is a
+percentage). If the header says neither, pass `--ratio` or `--percent`; otherwise the tool guesses
+from the values and prints a note on stderr. Either flag overrides the header.
 
 ## Three different problems
 

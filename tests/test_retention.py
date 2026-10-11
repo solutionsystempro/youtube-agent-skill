@@ -21,6 +21,19 @@ def api_csv():
     return "\n".join(rows) + "\n"
 
 
+def low_percent_csv():
+    """A Studio percentage export where retention never rises above 2%."""
+    rows = ["Video position (%),Absolute audience retention (%)"]
+    rows += [f"{i},{2 - i * 0.015:.3f}" for i in range(101)]
+    return "\n".join(rows) + "\n"
+
+
+def unlabelled_csv(scale):
+    rows = ["position,retention"]
+    rows += [f"{i},{(2 - i * 0.015) * scale:.5f}" for i in range(101)]
+    return "\n".join(rows) + "\n"
+
+
 class Retention(unittest.TestCase):
     def setUp(self):
         self.d = tmpdir(self)
@@ -53,6 +66,36 @@ class Retention(unittest.TestCase):
         out = self.report(write(self.d, "r.csv", studio_csv()), "--duration", "600",
                           "--transcript", write(self.d, "t.srt", srt))
         self.assertIn("sponsor", " ".join(out["said"].values()))
+
+    def test_low_percentage_export_is_not_scaled(self):
+        r = run("yt-retention", "retention.py", write(self.d, "p.csv", low_percent_csv()), "--json")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        out = json.loads(r.stdout)
+        self.assertAlmostEqual(out["start"], 2.0)
+        self.assertNotIn("guessed", r.stderr)
+
+    def test_api_ratio_header_is_scaled(self):
+        out = self.report(write(self.d, "a.csv", api_csv()))
+        self.assertAlmostEqual(out["start"], 100.0)
+
+    def test_flag_overrides_header_and_values(self):
+        low = write(self.d, "p.csv", low_percent_csv())
+        self.assertAlmostEqual(self.report(low, "--ratio")["start"], 200.0)
+        api = write(self.d, "a.csv", api_csv())
+        self.assertAlmostEqual(self.report(api, "--percent")["start"], 1.0)
+        bare = write(self.d, "u.csv", unlabelled_csv(1))
+        self.assertAlmostEqual(self.report(bare, "--percent")["start"], 2.0)
+
+    def test_heuristic_notes_on_stderr(self):
+        r = run("yt-retention", "retention.py", write(self.d, "u.csv", unlabelled_csv(1)), "--json")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("guessed", r.stderr)
+        self.assertAlmostEqual(json.loads(r.stdout)["start"], 200.0)
+
+    def test_both_flags_is_an_error(self):
+        r = run("yt-retention", "retention.py", write(self.d, "r.csv", studio_csv()),
+                "--ratio", "--percent")
+        self.assertNotEqual(r.returncode, 0)
 
     def test_too_few_points(self):
         r = run("yt-retention", "retention.py", write(self.d, "e.csv", "a,b\n1,2\n"))

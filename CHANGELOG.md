@@ -17,6 +17,11 @@ six tools, same rules. The changes are fixes, tests and tighter instructions.
 - `retention.py`: `--duration 600 file.csv` (flag before the file) read `600` as the file. A YouTube
   Analytics API `audienceRetention` export (0-1 ratios) is now scaled to percent instead of being
   read as a near-zero curve. Same explicit-path loading of the shared parser.
+- `retention.py`: the ratio-or-percent decision came from the values alone, so a Studio percentage
+  export that stayed at or below 2% was scaled 100x. The column header now decides
+  (`audienceWatchRatio`, `relativeRetentionPerformance` and `elapsedVideoTimeRatio` are ratios, a
+  `%` or "percent" label is a percentage). New `--ratio` and `--percent` flags override it. The value
+  guess is only a last resort and prints a note on stderr.
 - `title.py`: `--thumb "..." titles.txt` (flag before the file) printed the help instead of running.
   The thumbnail word check now flags a fourth word, matching the documented three-word ceiling.
   An empty titles file is an error, not silence.

@@ -4,11 +4,14 @@
     python retention.py retention.csv
     python retention.py retention.csv --transcript transcript.srt   # names what was said at each drop
     python retention.py retention.csv --json
+    python retention.py retention.csv --ratio      # values are 0-1 API ratios (--percent: already %)
 
 Get the file from Studio: Analytics -> a video -> Engagement -> the audience-retention chart ->
 the download icon -> "Audience retention". Two columns, a position (percent or seconds) and a
 percentage still watching. A YouTube Analytics API audienceRetention report also works: its
 elapsedVideoTimeRatio and audienceWatchRatio columns are 0-1 ratios and are scaled to percent.
+The scale comes from the column header. --ratio or --percent overrides it; with neither, the values
+decide and a note goes to stderr.
 
 It reports three things, because they are three different problems with three different fixes:
   HOOK LEAK    what you lost in the first 30 seconds
@@ -21,7 +24,8 @@ report you can act on without scrubbing the video yourself.
 import csv, importlib.util, json, os, re, sys
 
 def load_csv(path):
-    rows = []
+    """Returns the (position, retention) rows and the header labels above those two columns."""
+    rows, header, labels = [], [], None
     with open(path, newline="", encoding="utf-8-sig", errors="replace") as fh:
         for r in csv.reader(fh):
             nums = []
@@ -29,16 +33,36 @@ def load_csv(path):
                 c = c.strip().replace("%", "").replace(",", "")
                 try: nums.append(float(c))
                 except ValueError: nums.append(None)
-            vals = [n for n in nums if n is not None]
-            if len(vals) >= 2: rows.append((vals[0], vals[1]))
-    return rows
+            idx = [i for i, n in enumerate(nums) if n is not None]
+            if len(idx) < 2:
+                if not rows: header = r
+                continue
+            if labels is None: labels = [header[i] if i < len(header) else "" for i in idx[:2]]
+            rows.append((nums[idx[0]], nums[idx[1]]))
+    return rows, labels or ["", ""]
 
-def to_percent(rows):
+RATIO_COLUMNS = ("audiencewatchratio", "relativeretentionperformance", "elapsedvideotimeratio")
+
+def column_kind(label):
+    """'ratio' for YouTube Analytics API columns, 'percent' for Studio's labelled percentages,
+    None when the header does not say."""
+    low = label.strip().lower()
+    if any(k in low for k in RATIO_COLUMNS): return "ratio"
+    if "%" in low or "percent" in low: return "percent"
+    return None
+
+def to_percent(rows, labels=("", ""), force=None):
     """Studio exports percentages; the Analytics API returns 0-1 ratios. Scale ratios up so the
-    thresholds below (25% hook leak, 0.8% cliffs) mean the same thing for both."""
+    thresholds below (25% hook leak, 0.8% cliffs) mean the same thing for both. Order of authority:
+    the --ratio / --percent flag, then the column header, then (with a stderr note) the values."""
     xs = [r[0] for r in rows]; ys = [r[1] for r in rows]
-    if max(xs) <= 1.0: xs = [x * 100 for x in xs]
-    if max(ys) <= 2.0: ys = [y * 100 for y in ys]
+    kx = force or column_kind(labels[0]); ky = force or column_kind(labels[1])
+    if kx == "ratio" or (kx is None and max(xs) <= 1.0): xs = [x * 100 for x in xs]
+    if ky is None:
+        ky = "ratio" if max(ys) <= 2.0 else "percent"
+        print(f"note: retention scale guessed from the values ({ky}); pass --ratio or --percent "
+              "if that is wrong", file=sys.stderr)
+    if ky == "ratio": ys = [y * 100 for y in ys]
     return list(zip(xs, ys))
 
 def load_cues(path):
@@ -56,13 +80,15 @@ def main():
     if hasattr(sys.stdout, "reconfigure"): sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     a = sys.argv[1:]
     as_json = "--json" in a; a = [x for x in a if x != "--json"]
+    if "--ratio" in a and "--percent" in a: sys.exit("pass --ratio or --percent, not both")
+    force = "ratio" if "--ratio" in a else "percent" if "--percent" in a else None
     tr = a[a.index("--transcript") + 1] if "--transcript" in a else None
     values = {i + 1 for i, x in enumerate(a) if x in ("--transcript", "--duration")}
     files = [x for i, x in enumerate(a) if i not in values and not x.startswith("--")]
     if not files or not os.path.exists(files[0]): print(__doc__); sys.exit(1)
-    rows = load_csv(files[0])
+    rows, labels = load_csv(files[0])
     if len(rows) < 8: print("could not read at least 8 data points from that csv"); sys.exit(1)
-    rows = to_percent(rows)
+    rows = to_percent(rows, labels, force)
     xs = [r[0] for r in rows]; ys = [r[1] for r in rows]
     pct_axis = max(xs) <= 100.5
     dur = None
