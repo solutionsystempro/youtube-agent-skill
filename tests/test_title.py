@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Ian Ryan Kirk. MIT License.
 import json, unittest
 
 from helpers import load_tool, run, tmpdir, write

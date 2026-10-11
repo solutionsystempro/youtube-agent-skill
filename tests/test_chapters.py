@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Ian Ryan Kirk. MIT License.
 import json, os, shutil, unittest
 
 from helpers import SKILLS, make_srt, run, tmpdir, write

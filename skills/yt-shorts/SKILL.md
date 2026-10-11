@@ -5,6 +5,10 @@ description: >-
   write them, using the transcript to pick self-contained moments. Use for
   "cut my video into Shorts", "what should I clip for YouTube Shorts", or
   repurposing a long YouTube video into Shorts.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-shorts

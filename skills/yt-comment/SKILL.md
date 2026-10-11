@@ -5,6 +5,10 @@ description: >-
   triaged by which ones are worth answering. Use for "reply to my YouTube
   comments", "handle my YouTube comment section", or a pasted YouTube comment
   thread. Drafts only; the user posts.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-comment

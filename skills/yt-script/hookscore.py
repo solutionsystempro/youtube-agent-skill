@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Original (c) 2026 Jake Schincariol. Modifications (c) 2026 Ian Ryan Kirk. MIT License.
 """hookscore.py - score a YouTube hook before you waste a take on it.
 
 Five properties, 0-100 each, and a verdict that is 60% the mean and 40% the weakest one. The

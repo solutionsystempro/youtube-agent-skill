@@ -5,6 +5,10 @@ description: >-
   actually leave, then say what to change. Use for "why do people stop
   watching my YouTube video", "my YouTube retention is bad", a pasted YouTube
   retention chart or CSV, or "fix the pacing of my video".
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-retention

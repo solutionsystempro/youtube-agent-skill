@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Original (c) 2026 Jake Schincariol. Modifications (c) 2026 Ian Ryan Kirk. MIT License.
 """chapters.py - YouTube chapters from a timestamped transcript.
 
     python chapters.py transcript.srt            # or .vtt / whisper .json

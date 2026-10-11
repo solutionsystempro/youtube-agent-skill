@@ -6,6 +6,10 @@ description: >-
   "what's working on YouTube in my niche", "find outlier YouTube videos",
   "why did this YouTube video blow up", YouTube competitor research, or a
   YouTube swipe file.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-viral

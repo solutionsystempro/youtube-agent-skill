@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Original (c) 2026 Jake Schincariol. Modifications (c) 2026 Ian Ryan Kirk. MIT License.
 """deadair.py - an edit decision list from a timestamped transcript.
 
     python deadair.py transcript.srt            # or .vtt, or whisper .json

@@ -5,6 +5,10 @@ description: >-
   what order, sized to the creator's actual capacity. Use for "plan my
   YouTube uploads", "YouTube content calendar", "what should I post on my
   channel next", or "I have no idea what video to make next".
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-plan

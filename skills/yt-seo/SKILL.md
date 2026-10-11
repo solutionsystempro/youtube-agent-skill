@@ -5,6 +5,10 @@ description: >-
   aimed at the query a real person types. Use for "write my YouTube
   description", "YouTube tags", "YouTube SEO", or "nobody is finding my
   video on YouTube". Not for website SEO.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-seo

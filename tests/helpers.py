@@ -1,3 +1,4 @@
+# Copyright (c) 2026 Ian Ryan Kirk. MIT License.
 """Shared helpers for the tool tests. Standard library only."""
 import importlib.util, os, subprocess, sys, tempfile
 

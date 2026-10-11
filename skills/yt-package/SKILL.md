@@ -6,6 +6,10 @@ description: >-
   YouTube title ideas, YouTube thumbnail text, low click-through rate on a
   YouTube video, or renaming or repackaging an existing YouTube video. Not
   for titles of articles, emails or documents.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-package

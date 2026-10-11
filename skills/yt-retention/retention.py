@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Original (c) 2026 Jake Schincariol. Modifications (c) 2026 Ian Ryan Kirk. MIT License.
 """retention.py - read a YouTube Studio audience-retention export and find the leaks.
 
     python retention.py retention.csv

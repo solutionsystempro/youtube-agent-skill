@@ -3,7 +3,7 @@
   "description": "Eleven Claude skills that run a YouTube channel: scripts off 21 hook formulas with a scored hook, title and thumbnail linted as one pairing, an edit decision list from your transcript, a retention reader that finds the exact moments people leave, a Shorts cutter, chapters, search, comments, the weekly plan, a channel audit, and a virality engine that ranks your niche by outlier multiple rather than by channel size.",
   "version": "1.1.0",
   "author": {
-    "name": "Ian Ryan Kirk",
+    "name": "Ian Ryan Kirk (maintainer, modifications); original by Jake Schincariol",
     "url": "https://github.com/solutionsystempro"
   },
   "homepage": "https://github.com/solutionsystempro/youtube-agent-skill",

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Original (c) 2026 Jake Schincariol. Modifications (c) 2026 Ian Ryan Kirk. MIT License.
 """swipe.py - rank collected videos by how far each beat its OWN channel, then name the formula.
 
     python swipe.py collected.json

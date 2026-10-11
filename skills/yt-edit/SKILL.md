@@ -5,6 +5,10 @@ description: >-
   into an edit decision list - dead air, filler cues and retakes, with
   timecodes. Use for "cut the dead space from my video", "tighten this
   recording", or any request to shorten video footage from its transcript.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-edit

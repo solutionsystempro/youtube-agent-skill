@@ -5,6 +5,10 @@ description: >-
   YouTube's own rules so they actually render. Use for "add YouTube
   chapters", "chapter timestamps for my video description", or "break this
   YouTube video into chapters".
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-chapters

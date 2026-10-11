@@ -7,6 +7,10 @@ description: >-
   opening line, "write my next YouTube video", or is about to record a
   YouTube video without the first fifteen seconds. Not for ads, emails or
   written posts.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-script

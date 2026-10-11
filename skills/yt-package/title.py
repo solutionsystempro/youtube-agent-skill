@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Original (c) 2026 Jake Schincariol. Modifications (c) 2026 Ian Ryan Kirk. MIT License.
 """title.py - lint a YouTube title and thumbnail pairing before you publish it.
 
     python title.py --title "..." --thumb "AI RAN IT"

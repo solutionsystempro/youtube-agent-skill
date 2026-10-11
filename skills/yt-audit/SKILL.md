@@ -5,6 +5,10 @@ description: >-
   the first fifteen seconds, and what to fix first. Use for "audit my YouTube
   channel", "why isn't my YouTube channel growing", or when the user shares
   their own YouTube channel for review.
+license: MIT
+metadata:
+  maintainer: Ian Ryan Kirk
+  original-author: Jake Schincariol
 ---
 
 # yt-audit
