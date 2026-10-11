@@ -3,8 +3,8 @@ name: yt-plan
 description: >-
   Plan a week or a month of YouTube uploads - what to post, when, and in
   what order, sized to the creator's actual capacity. Use for "plan my
-  week", "content calendar", "what should I post", "I have no idea what to
-  make next".
+  YouTube uploads", "YouTube content calendar", "what should I post on my
+  channel next", or "I have no idea what video to make next".
 ---
 
 # yt-plan

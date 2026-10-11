@@ -1,15 +1,19 @@
 ---
 name: yt-shorts
 description: >-
-  Find the Shorts hiding inside a long video and write them, using the
-  transcript to pick self-contained moments. Use for "cut this into shorts",
-  "clip this", "repurpose this video", "what should I clip".
+  Find the YouTube Shorts hiding inside the user's own long-form video and
+  write them, using the transcript to pick self-contained moments. Use for
+  "cut my video into Shorts", "what should I clip for YouTube Shorts", or
+  repurposing a long YouTube video into Shorts.
 ---
 
 # yt-shorts
 
 A Short cut out of a long video is not a clip of the best moment. It is a moment that **survives
 without the video around it**, which is a much smaller set.
+
+Work from the user's own videos, or footage they hold the rights to. Never download someone else's
+video to clip it.
 
 ## Picking
 
@@ -25,7 +29,7 @@ reject one without reading the whole transcript.
 ## Writing each one
 
 - **A NEW first line.** The long video's line assumes context this viewer does not have. Write the
-  replacement and run it through `../yt-script/hookscore.py`.
+  replacement and run it through `python "${CLAUDE_SKILL_DIR}/../yt-script/hookscore.py" --hook "..."`.
 - **On-screen text for the first two seconds**, different words from the spoken line.
 - **A loop point**: what the last line sets up so the first line answers it.
 - Vertical framing note - what gets cropped out of a 16:9 frame and whether that matters.

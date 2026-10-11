@@ -3,8 +3,8 @@ name: yt-retention
 description: >-
   Read a YouTube Studio audience-retention export and find where viewers
   actually leave, then say what to change. Use for "why do people stop
-  watching", "my retention is bad", a pasted retention chart or CSV, or "fix
-  my pacing".
+  watching my YouTube video", "my YouTube retention is bad", a pasted YouTube
+  retention chart or CSV, or "fix the pacing of my video".
 ---
 
 # yt-retention
@@ -12,12 +12,18 @@ description: >-
 The retention graph is the only honest feedback YouTube gives you. Almost nobody exports it.
 
 ```bash
-python3 retention.py retention.csv --duration 600
-python3 retention.py retention.csv --transcript transcript.srt
+python "${CLAUDE_SKILL_DIR}/retention.py" retention.csv --duration 600
+python "${CLAUDE_SKILL_DIR}/retention.py" retention.csv --transcript transcript.srt
 ```
 
+`${CLAUDE_SKILL_DIR}` is this skill's folder. Use `python3` if that is what your system calls
+Python (common on macOS and Linux); on Windows it is usually `python`.
+`--transcript` reuses the parser in `yt-edit/deadair.py`, so keep `yt-edit` installed next to this
+folder.
+
 Getting the file: Studio -> a video -> Analytics -> Engagement -> the audience-retention chart ->
-the download icon -> "Audience retention".
+the download icon -> "Audience retention". The YouTube Analytics API `audienceRetention` report
+(the user's own OAuth) works too: its 0-1 ratio columns are scaled to percent automatically.
 
 ## Three different problems
 

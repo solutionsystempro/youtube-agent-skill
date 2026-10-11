@@ -3,8 +3,9 @@ name: yt-package
 description: >-
   Write and lint the title and thumbnail for a YouTube video as one pairing,
   checking truncation, duplication and vagueness before publish. Use for
-  "title ideas", "what should I call this", "thumbnail text", "my CTR is
-  bad", packaging, or any request to rename or repackage an existing video.
+  YouTube title ideas, YouTube thumbnail text, low click-through rate on a
+  YouTube video, or renaming or repackaging an existing YouTube video. Not
+  for titles of articles, emails or documents.
 ---
 
 # yt-package
@@ -13,9 +14,12 @@ The title and the thumbnail are ONE unit. Writing them separately is why most pa
 thumbnail repeats the title, and half the click surface says the same thing twice.
 
 ```bash
-python3 title.py --title "..." --thumb "AI RAN IT"
-python3 title.py titles.txt            # one per line, ranked
+python "${CLAUDE_SKILL_DIR}/title.py" --title "..." --thumb "AI RAN IT"
+python "${CLAUDE_SKILL_DIR}/title.py" titles.txt            # one per line, ranked
 ```
+
+`${CLAUDE_SKILL_DIR}` is this skill's folder. Use `python3` if that is what your system calls
+Python (common on macOS and Linux); on Windows it is usually `python`.
 
 ## Before you write
 

@@ -1,9 +1,10 @@
 ---
 name: yt-comment
 description: >-
-  Draft replies to YouTube comments in the creator's voice, triaged by which
-  ones are worth answering. Use for "reply to my comments", "handle the
-  comment section", "someone asked X", or a pasted comment thread.
+  Draft replies to comments on the user's own YouTube videos, in their voice,
+  triaged by which ones are worth answering. Use for "reply to my YouTube
+  comments", "handle my YouTube comment section", or a pasted YouTube comment
+  thread. Drafts only; the user posts.
 ---
 
 # yt-comment
@@ -20,6 +21,11 @@ decide whether a thread becomes a conversation other people read.
    read it out loud.
 2. Never invent a number, a result or a source. If a figure would strengthen it and you do not have
    one, ask for it or write the line without it.
+
+## Getting the comments
+
+The user pastes them, or pulls them with the YouTube Data API (`commentThreads.list`) using their
+own key or OAuth. Do not scrape the watch page.
 
 ## Triage first, always
 
@@ -44,6 +50,13 @@ Sort what the user pastes into four piles and say how many are in each before wr
 
 Say which ONE comment to pin and why. Pin the question the most people also have, not the nicest
 one. Heart generously - it costs nothing and it is visible.
+
+## Never post for them
+
+Every reply is a draft. Do not post, heart or pin anything through the API, a browser or any other
+tool on the user's behalf. If the user has their own tooling that can post, each reply still needs
+their explicit approval, one at a time, never as a batch. YouTube's terms prohibit automated
+engagement, and a reply the creator did not read is not in their voice anyway.
 
 ## The gate
 

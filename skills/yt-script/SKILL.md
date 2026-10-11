@@ -3,21 +3,25 @@ name: yt-script
 description: >-
   Write a YouTube video script from a raw idea - hook options off 21
   formulas, scored, then the full spoken script with the retention beats
-  marked. Use whenever the user wants a video script, a hook, an opening
-  line, "what should I say", "write my next video", or is about to record
-  and does not have the first fifteen seconds yet.
+  marked. Use when the user wants a YouTube video script, a YouTube hook or
+  opening line, "write my next YouTube video", or is about to record a
+  YouTube video without the first fifteen seconds. Not for ads, emails or
+  written posts.
 ---
 
 # yt-script
 
 One idea into a script somebody finishes.
 
-Two tools live in this folder and both actually run. Use them. Do not eyeball the hook.
+The scorer and its formula library live in this folder, and the scorer actually runs. Use them. Do not eyeball the hook.
 
 ```bash
-python3 hookscore.py hooks.txt              # rank your hook options
-python3 hookscore.py --hook "one line"      # score a single one
+python "${CLAUDE_SKILL_DIR}/hookscore.py" hooks.txt              # rank your hook options
+python "${CLAUDE_SKILL_DIR}/hookscore.py" --hook "one line"      # score a single one
 ```
+
+`${CLAUDE_SKILL_DIR}` is this skill's folder. Use `python3` if that is what your system calls
+Python (common on macOS and Linux); on Windows it is usually `python`.
 
 ## Before you write
 

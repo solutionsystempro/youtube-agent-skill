@@ -1,9 +1,10 @@
 ---
 name: yt-audit
 description: >-
-  Audit a YouTube channel end to end - packaging, consistency, the first
-  fifteen seconds, and what to fix first. Use for "audit my channel", "why
-  isn't my channel growing", "review my videos", or a pasted channel URL.
+  Audit the user's own YouTube channel end to end - packaging, consistency,
+  the first fifteen seconds, and what to fix first. Use for "audit my YouTube
+  channel", "why isn't my YouTube channel growing", or when the user shares
+  their own YouTube channel for review.
 ---
 
 # yt-audit
@@ -20,18 +21,28 @@ An audit that lists twenty problems is a way of avoiding the one that matters. T
 2. Never invent a number, a result or a source. If a figure would strengthen it and you do not have
    one, ask for it or write the line without it.
 
+## Getting the data
+
+From the user, in this order of preference: a YouTube Studio export (Content and Analytics both
+download as CSV), the YouTube Data API or YouTube Analytics API with the user's own key or OAuth, or
+titles and transcripts they paste. Do not scrape the channel page or drive a browser to collect it.
+
 ## What to look at, in this order
 
 1. **The last ten titles, as a set.** Read them as a list, the way the channel page shows them. Do
-   they promise different things? Run them through `../yt-package/title.py`. A channel where every
-   title is the same shape has a format problem, not a title problem.
+   they promise different things? Run them through
+   `python "${CLAUDE_SKILL_DIR}/../yt-package/title.py" titles.txt`. A channel where every title is
+   the same shape has a format problem, not a title problem.
 2. **The thumbnails, at feed size.** Shrink them. What survives? If three of them are unreadable at
    that size, that is the fix and nothing else matters yet.
 3. **The first fifteen seconds of the three most recent.** Transcribe them and score with
-   `../yt-script/hookscore.py`. This is where most channels lose.
+   `python "${CLAUDE_SKILL_DIR}/../yt-script/hookscore.py"`. This is where most channels lose.
 4. **Upload rhythm.** Not frequency - CONSISTENCY. Six videos in one week and then nothing for a
    month is worse than one a fortnight forever.
 5. **The retention shape**, if they can export it. `/yt-retention`.
+
+`${CLAUDE_SKILL_DIR}` is this skill's folder. Use `python3` if that is what your system calls
+Python (common on macOS and Linux); on Windows it is usually `python`.
 
 ## What to hand back
 

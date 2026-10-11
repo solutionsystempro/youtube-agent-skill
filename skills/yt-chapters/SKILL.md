@@ -1,16 +1,22 @@
 ---
 name: yt-chapters
 description: >-
-  Write YouTube chapters from a transcript, validated against YouTube's own
-  rules so they actually render. Use for "add chapters", "timestamps",
-  "break this video into sections".
+  Write YouTube chapters from a video transcript, validated against
+  YouTube's own rules so they actually render. Use for "add YouTube
+  chapters", "chapter timestamps for my video description", or "break this
+  YouTube video into chapters".
 ---
 
 # yt-chapters
 
 ```bash
-python3 chapters.py transcript.srt --target 8
+python "${CLAUDE_SKILL_DIR}/chapters.py" transcript.srt --target 8
 ```
+
+`${CLAUDE_SKILL_DIR}` is this skill's folder. Use `python3` if that is what your system calls
+Python (common on macOS and Linux); on Windows it is usually `python`.
+It reuses the transcript parser in `yt-edit/deadair.py`, so keep the `yt-edit` folder installed next
+to this one (or copy `deadair.py` into this folder).
 
 ## The rules, which are not optional
 
@@ -21,7 +27,7 @@ sits in the description doing nothing:
 - There must be **at least three**.
 - Each must be **at least 10 seconds** long.
 
-The tool checks all three and tells you when a list is invalid rather than letting you paste it.
+The tool checks all three, never aims for fewer than three, and tells you when a list is invalid rather than letting you paste it.
 
 ## Retitle every line
 

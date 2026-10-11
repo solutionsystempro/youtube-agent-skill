@@ -1,10 +1,10 @@
 ---
 name: yt-edit
 description: >-
-  Turn a raw recording's transcript into an edit decision list - dead air,
-  filler cues and retakes, with timecodes. Use for "edit this", "cut the
-  dead space", "tighten this video", "I rambled", or any request to shorten
-  footage from a transcript.
+  Turn the transcript (SRT, VTT or Whisper JSON) of a raw YouTube recording
+  into an edit decision list - dead air, filler cues and retakes, with
+  timecodes. Use for "cut the dead space from my video", "tighten this
+  recording", or any request to shorten video footage from its transcript.
 ---
 
 # yt-edit
@@ -12,12 +12,16 @@ description: >-
 An edit decision list from a timestamped transcript. It prints the cuts. You apply them.
 
 ```bash
-python3 deadair.py transcript.srt              # srt, vtt or whisper json
-python3 deadair.py transcript.srt --floor 0.35 --json
+python "${CLAUDE_SKILL_DIR}/deadair.py" transcript.srt              # srt, vtt or whisper json
+python "${CLAUDE_SKILL_DIR}/deadair.py" transcript.srt --floor 0.35 --json
 ```
 
+`${CLAUDE_SKILL_DIR}` is this skill's folder. Use `python3` if that is what your system calls
+Python (common on macOS and Linux); on Windows it is usually `python`.
+
 No transcript yet? Ask for one, or produce one first - `whisper`, `faster-whisper`, or the caption
-track YouTube generates on an unlisted upload all work. Do not guess at timings.
+track YouTube generates on the user's own unlisted upload (download it from Studio, Subtitles) all
+work. Do not guess at timings.
 
 ## What it finds
 
