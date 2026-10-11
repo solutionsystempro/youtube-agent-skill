@@ -2,7 +2,10 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "youtube-agent-skill",
   "description": "The YouTube agent skill pack for Claude",
-  "owner": { "name": "Jake Schincariol", "url": "https://opusjake.ai" },
+  "owner": {
+    "name": "Ian Ryan Kirk",
+    "url": "https://github.com/solutionsystempro"
+  },
   "plugins": [
     {
       "name": "youtube-agent",
@@ -10,7 +13,7 @@
       "source": "./",
       "version": "1.1.0",
       "category": "productivity",
-      "homepage": "https://github.com/Jakeschincariol/youtube-agent-skill"
+      "homepage": "https://github.com/solutionsystempro/youtube-agent-skill"
     }
   ]
 }

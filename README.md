@@ -23,7 +23,7 @@ channel, not by how big the channel is.
 Paste this into Claude:
 
 ```
-https://github.com/Jakeschincariol/youtube-agent-skill
+https://github.com/solutionsystempro/youtube-agent-skill
 
 Install this skill, then confirm /yt-script works.
 ```
@@ -32,14 +32,14 @@ Or do it yourself, in Claude Code:
 
 ```bash
 # macOS, Linux, or Git Bash on Windows
-git clone https://github.com/Jakeschincariol/youtube-agent-skill.git
+git clone https://github.com/solutionsystempro/youtube-agent-skill.git
 mkdir -p ~/.claude/skills
 cp -r youtube-agent-skill/skills/yt-* ~/.claude/skills/
 ```
 
 ```powershell
 # Windows PowerShell
-git clone https://github.com/Jakeschincariol/youtube-agent-skill.git
+git clone https://github.com/solutionsystempro/youtube-agent-skill.git
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
 Copy-Item -Recurse youtube-agent-skill\skills\yt-* "$HOME\.claude\skills\"
 ```
@@ -50,7 +50,7 @@ Copy all eleven folders together. `yt-chapters` and `yt-retention` reuse the tra
 Or as a plugin:
 
 ```
-/plugin marketplace add Jakeschincariol/youtube-agent-skill
+/plugin marketplace add solutionsystempro/youtube-agent-skill
 /plugin install youtube-agent
 ```
 
